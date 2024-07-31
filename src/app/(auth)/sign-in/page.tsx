@@ -50,7 +50,7 @@ export default function SignInForm() {
         if (result?.error) {
             toast({
                 title: "Login Failed",
-                description:"Incorrect username or password",
+                description:"Incorrect username or Password",
                 variant : 'destructive'
             })
         }

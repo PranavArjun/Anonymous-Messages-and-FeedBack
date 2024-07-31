@@ -24,7 +24,7 @@ const DashBoard = () => {
     const { toast } = useToast()
 
     const handleDeleteMessage = (messageId: string) => {
-        setMessages(messages.filter((message) => message._id !== messageId))
+        setMessages(messages.filter((message) => message._id !== messageId));
     }
 
     const { data: session } = useSession()
@@ -33,7 +33,7 @@ const DashBoard = () => {
         resolver: zodResolver(acceptMessageSchema)
     })
 
-    const { register, watch, setValue } = form
+    const { register, watch, setValue } = form;
 
     const acceptMessages = watch('acceptMessages')
 
@@ -46,7 +46,7 @@ const DashBoard = () => {
             const axiosError = error as AxiosError<ApiResponse>;
             toast({
                 title: "Error",
-                description: axiosError.response?.data.message || "ailed to fetch message setting",
+                description: axiosError.response?.data.message || "Failed to fetch message setting",
                 variant: "destructive"
             })
         }
@@ -72,7 +72,7 @@ const DashBoard = () => {
             const axiosError = error as AxiosError<ApiResponse>;
             toast({
                 title: "Error",
-                description: axiosError.response?.data.message || "ailed to fetch message setting",
+                description: axiosError.response?.data.message || "Failed to fetch message setting",
                 variant: "destructive"
             })
         }
@@ -101,13 +101,20 @@ const DashBoard = () => {
             const axiosError = error as AxiosError<ApiResponse>;
             toast({
                 title: "Error",
-                description: axiosError.response?.data.message || "ailed to fetch message setting",
+                description: axiosError.response?.data.message || "Failed to fetch message setting",
                 variant: "destructive"
             })
         }
     }
 
-    const { username } = session?.user as User;
+
+
+
+    if (!session || !session.user) {
+        return <div> Please LogIn</div>
+    }
+
+    const { username } = session.user as User;
 
     const baseUrl = `${window.location.protocol}//${window.location.host}`;
     const profileUrl = `${baseUrl}/u/${username}`;
@@ -121,11 +128,6 @@ const DashBoard = () => {
     };
 
 
-    if (!session || !session.user) {
-        return <div> Please LogIn</div>
-    }
-
-    
 
     return (
         <div className="my-8 mx-4 md:mx-8 lg:mx-auto p-6 bg-white rounded w-full max-w-6xl">
