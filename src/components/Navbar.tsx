@@ -1,38 +1,92 @@
 'use client'
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { useSession, signOut } from 'next-auth/react';
-import { Button } from './ui/button';
 import { User } from 'next-auth';
+import Image from 'next/image';
+import { Menu , X } from 'lucide-react';
 
 function Navbar() {
   const { data: session } = useSession();
-  const user : User = session?.user;
+  const user: User = session?.user;
+
+  const [nav, setNav] = useState(false);
+  const links = [
+    {
+      id: 1,
+      name: "Home",
+      link: "/"
+    },
+    {
+      id: 2,
+      name: "Dashboard",
+      link: "/dashboard"
+    },
+    {
+      id: 3,
+      name: "User Guid",
+      link: "/guidbook"
+    },
+
+
+  ]
 
   return (
-    <nav className="p-4 md:p-6 shadow-md bg-gray-900 text-white">
-      <div className="container mx-auto flex flex-col md:flex-row justify-between items-center">
-        <a href="#" className="text-xl font-bold mb-4 md:mb-0">
-          Anonymous Messages
-        </a>
-        {session ? (
-          <>
-            <span className="mr-4">
-              Welcome, {user.username || user.email}
-            </span>
-            <Button onClick={() => signOut()} className="w-full md:w-auto bg-slate-100 text-black" variant='outline'>
-              LogOut
-            </Button>
-          </>
-        ) : (
-          <Link href="/sign-in">
-            <Button className="w-full md:w-auto bg-slate-100 text-black" variant={'outline'}>LogIn</Button>
-          </Link>
-        )}
+
+    <div className='flex justify-between items-center w-full h-20 px-4 text-white bg-black'>
+      
+      <div className='flex justify-center items-center'>
+        <Image src ='/images/AMLOGO.png' alt='Logo' width ={80} height={60}/>
+        <h1 className='text-lg md:text-2xl  hover:cursor-default'> Anonymus Messages </h1>
       </div>
-    </nav>
+
+      <ul className='hidden md:flex'>
+
+        {links.map(({ id, name, link }) => (
+          <li key={id} className='px-4 cursor-pointer capitalize text-gray-500 hover:scale-105 duration-200 text-lg'>
+            <Link href={link} >{name}</Link>
+          </li>
+        ))}
+        {session ? (
+            <li  className='px-4 cursor-pointer capitalize text-gray-500 hover:scale-105 duration-200 text-lg'>
+            <Link href={'/sign-in'}  onClick={() => {signOut()}}>LogOut</Link>
+          </li>
+          ) : (<li  className='px-4 cursor-pointer capitalize text-gray-500 hover:scale-105 duration-200 text-lg'>
+          <Link href={'/sign-in'}  >LogIn</Link>
+        </li>)}
+
+
+      </ul>
+
+      <div onClick={() => setNav(!nav)} className=' cursor-pointer pr-4 z-10 text-gray-500 md:hidden'>
+        {nav ? <X/> : <Menu/>}
+      </div>
+
+      {nav && (
+        <ul className='flex flex-col justify-center items-center absolute top-0 left-0 w-full h-screen bg-gradient-to-b from-black to-gray-700'>
+
+          {links.map(({ id, name, link }) => (
+            <li key={id} className='px-4 cursor-pointer capitalize py-6 text-4xl text-gray-500 hover:scale-105 duration-200'>
+              <Link href={link} onClick={() => setNav(!nav)}>{name}</Link>
+            </li>
+          ))}
+          {session ? (
+            <li  className='px-4 cursor-pointer capitalize py-6 text-4xl text-gray-500 hover:scale-105 duration-200'>
+            <Link href={'/sign-in'}  onClick={() => {setNav(!nav);signOut()}}>LogOut</Link>
+          </li>
+          ) : (<li  className='px-4 cursor-pointer capitalize py-6 text-4xl text-gray-500 hover:scale-105 duration-200'>
+          <Link href={'/sign-in'}  onClick={() => setNav(!nav)}>LogIn</Link>
+        </li>)}
+
+        </ul>
+      )}
+
+    </div>
+
+
   );
 }
 
 export default Navbar;
+
