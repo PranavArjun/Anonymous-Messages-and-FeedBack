@@ -1,18 +1,17 @@
-'use client'
-import { useCompletion } from 'ai/react';
-import { messageSchem } from "@/schemas/messageSchema"
-import { zodResolver } from "@hookform/resolvers/zod"
-import axios, { AxiosError } from "axios"
+'use client';
+
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import axios, { AxiosError } from 'axios';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
 import { useParams } from "next/navigation"
-import { useState } from "react"
-import { useForm } from "react-hook-form"
-import * as z from 'zod'
-import { toast } from '@/components/ui/use-toast'
-import { ApiResponse } from "@/types/ApiResponse"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { Textarea } from "@/components/ui/textarea"
+import { toast } from '@/components/ui/use-toast';
+import { ApiResponse } from '@/types/ApiResponse';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { Loader2 } from "lucide-react"
+import { Loader2 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { CardHeader, CardContent, Card } from '@/components/ui/card';
 import Link from 'next/link';
@@ -23,32 +22,24 @@ const parseStringMessages = (messageString: string): string[] => {
     return messageString.split(specialChar);
 };
 
-const initialMessageString =
+const initialMessageString = 
     "What's your favorite movie?||Do you have any pets?||What's your dream job?";
 
+const messageSchema = z.object({
+    content: z.string().min(1, 'Message cannot be empty'),
+});
 
 export default function SendMessages() {
     const params = useParams<{ username: string }>()
-    const username = params.username
+    const username = params.username;
 
+    const [messages, setMessages] = useState<string[]>(parseStringMessages(initialMessageString));
 
-    const {
-        complete,
-        completion,
-        isLoading: isSuggestLoading,
-        error,
-    } = useCompletion({
-        api: '/api/suggest-messages',
-        initialCompletion: initialMessageString,
+    const [isLoading, setIsLoading] = useState(false);
+
+    const form = useForm<z.infer<typeof messageSchema>>({
+        resolver: zodResolver(messageSchema),
     });
-
-
-
-
-    const form = useForm<z.infer<typeof messageSchem>>({
-        resolver: zodResolver(messageSchem)
-    })
-
 
     const messageContent = form.watch('content');
 
@@ -56,16 +47,13 @@ export default function SendMessages() {
         form.setValue('content', message);
     };
 
-    const [isLoading, setIsLoading] = useState(false)
-
-    const onSubmit = async (data: z.infer<typeof messageSchem>) => {
-        setIsLoading(true)
+    const onSubmit = async (data: z.infer<typeof messageSchema>) => {
+        setIsLoading(true);
         try {
             const response = await axios.post<ApiResponse>('/api/send-message', {
                 ...data,
                 username,
             });
-
             toast({
                 title: response.data.message,
                 variant: 'default',
@@ -76,30 +64,31 @@ export default function SendMessages() {
             toast({
                 title: 'Error',
                 description:
-                    axiosError.response?.data.message ?? 'Failed to sent message',
+                    axiosError.response?.data.message ?? 'Failed to send message',
                 variant: 'destructive',
             });
         } finally {
-            setIsLoading(false)
+            setIsLoading(false);
         }
-
-    }
+    };
 
     const fetchSuggestedMessages = async () => {
         try {
-            complete('');
+            const response = await fetch('/api/suggest-messages');
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const text = await response.text();
+            setMessages(parseStringMessages(text));
         } catch (error) {
-            console.error('Error fetching messages:', error);
-            // Handle error appropriately
+            console.error('Failed to fetch messages:', error);
         }
     };
 
     return (
         <div className="container mx-auto my-8 p-6 bg-white rounded max-w-4xl">
-            <h1 className="text-4xl font-bold mb-6 text-center">
-                Public Profile Link
-            </h1>
-            <Form {...form} >
+            <h1 className="text-4xl font-bold mb-6 text-center">Public Profile Link</h1>
+            <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                     <FormField
                         control={form.control}
@@ -128,20 +117,17 @@ export default function SendMessages() {
                             <Button type="submit" disabled={isLoading || !messageContent}>
                                 Send Message
                             </Button>
-
-
                         )}
                     </div>
                 </form>
             </Form>
-
 
             <div className="space-y-4 my-8">
                 <div className="space-y-2">
                     <Button
                         onClick={fetchSuggestedMessages}
                         className="my-4"
-                        disabled={isSuggestLoading}
+                        disabled={isLoading}
                     >
                         Suggest Messages
                     </Button>
@@ -152,10 +138,8 @@ export default function SendMessages() {
                         <h3 className="text-xl font-semibold">Messages</h3>
                     </CardHeader>
                     <CardContent className="flex flex-col space-y-4">
-                        {error ? (
-                            <p className="text-red-500">{error.message}</p>
-                        ) : (
-                            parseStringMessages(completion).map((message, index) => (
+                        {messages.length > 0 ? (
+                            messages.map((message, index) => (
                                 <Button
                                     key={index}
                                     variant="outline"
@@ -165,10 +149,13 @@ export default function SendMessages() {
                                     {message}
                                 </Button>
                             ))
+                        ) : (
+                            <p>No messages available</p>
                         )}
                     </CardContent>
                 </Card>
             </div>
+
             <Separator className="my-6" />
             <div className="text-center">
                 <div className="mb-4">Get Your Message Board</div>
@@ -177,5 +164,5 @@ export default function SendMessages() {
                 </Link>
             </div>
         </div>
-    )
+    );
 }

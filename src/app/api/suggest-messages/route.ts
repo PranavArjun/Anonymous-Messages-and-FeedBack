@@ -1,70 +1,128 @@
-// import OpenAI from 'openai';
-// import { OpenAIStream, StreamingTextResponse } from 'ai';
-// import { NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
-// const openai = new OpenAI({
-//   apiKey: process.env.OPENAI_API_KEY,
-// });
+// List of 100 questions
+const questions = [
+  "What's your favorite book?",
+  "What's a place you'd visit?",
+  "What's a hobby you enjoy?",
+  "If you could have dinner with anyone, who?",
+  "What's a recent accomplishment you're proud of?",
+  "What's a skill you want to learn?",
+  "What's a movie you recommend?",
+  "What's something you do to relax?",
+  "If you could meet anyone, living or dead, who?",
+  "What's a tradition you cherish?",
+  "What's a dream you have?",
+  "What's a favorite food?",
+  "What's a song that lifts your mood?",
+  "What's a fun fact about you?",
+  "What's a goal you're working on?",
+  "What's an interesting place you've been?",
+  "What's a favorite memory?",
+  "What's a book you think everyone should read?",
+  "What's something you wish you knew more about?",
+  "What's a new experience you'd like to try?",
+  "What's a piece of advice you value?",
+  "What's a childhood memory you cherish?",
+  "What's a favorite way to spend your day off?",
+  "What's a meaningful quote to you?",
+  "What's a recent learning experience?",
+  "What's a unique talent you have?",
+  "What's a cause you care about?",
+  "What's a recent hobby you picked up?",
+  "What's a favorite family tradition?",
+  "What's a place you find peaceful?",
+  "What's a new skill you're learning?",
+  "What's a favorite activity to do with friends?",
+  "What's a book you couldn't put down?",
+  "What's a favorite way to unwind?",
+  "What's a question you wish people asked you?",
+  "What's a favorite meal to cook?",
+  "What's a memorable trip you've taken?",
+  "What's something you find inspiring?",
+  "What's a fun activity you enjoy?",
+  "What's a way you practice self-care?",
+  "What's a hobby you could talk about for hours?",
+  "What's a recent goal you've achieved?",
+  "What's a favorite way to stay active?",
+  "What's a show or movie you're currently watching?",
+  "What's a place you'd love to visit?",
+  "What's a favorite childhood game?",
+  "What's a recent accomplishment you're proud of?",
+  "What's a book that changed your perspective?",
+  "What's a unique tradition in your family?",
+  "What's a place where you feel most at ease?",
+  "What's a fun fact about your hometown?",
+  "What's a song that brings back memories?",
+  "What's a hobby you enjoy during the weekend?",
+  "What's a memorable lesson you've learned?",
+  "What's a way you like to be creative?",
+  "What's a recent event that made you happy?",
+  "What's a topic you're passionate about?",
+  "What's a goal you have for the future?",
+  "What's a favorite way to spend a rainy day?",
+  "What's a book you recommend to others?",
+  "What's a memorable gift you've received?",
+  "What's a tradition you follow each year?",
+  "What's a fun place to hang out with friends?",
+  "What's a recent experience that made you smile?",
+  "What's a favorite recipe you love to cook?",
+  "What's a place you go for inspiration?",
+  "What's a song that motivates you?",
+  "What's a dream destination for travel?",
+  "What's a way you like to help others?",
+  "What's a favorite quote that inspires you?",
+  "What's a new habit you're trying to form?",
+  "What's a favorite weekend activity?",
+  "What's a memorable moment from your childhood?",
+  "What's a way you enjoy spending time alone?",
+  "What's a book or movie that made you think?",
+  "What's a hobby you’d like to try?",
+  "What's a recent achievement you're happy about?",
+  "What's a favorite snack to indulge in?",
+  "What's a place that brings you joy?",
+  "What's a fun activity for a day off?",
+  "What's a memorable piece of advice you've received?",
+  "What's a creative project you're working on?",
+  "What's a favorite outdoor activity?",
+  "What's a question you often ponder?",
+  "What's a favorite game or sport?",
+  "What's a recent change that made you happy?",
+  "What's a fun fact about yourself?",
+  "What's a book that made you laugh?",
+  "What's a dream or aspiration you have?",
+  "What's a favorite way to relax after work?",
+  "What's a place that inspires you?",
+  "What's a hobby you enjoy with family?",
+  "What's a song you always sing along to?",
+  "What's a memorable holiday or celebration?",
+  "What's a recent activity that energized you?",
+  "What's a favorite way to spend an afternoon?",
+  "What's a lesson you learned recently?",
+  "What's a place where you feel most creative?",
+  "What's a fun memory with friends?",
+  "What's a new experience you enjoyed recently?",
+  "What's a favorite way to stay motivated?",
+  "What's a book or show you're excited about?",
+  "What's a recent decision you're happy with?",
+  "What's a unique experience you've had?",
+  "What's a favorite quote that guides you?",
+  "What's a fun way to spend a day off?",
+  "What's a hobby you've kept since childhood?"
+];
 
-// export const runtime = 'edge';
 
-// export async function POST(req: Request) {
-//   try {
-    // const prompt =
-    //   "Create a list of three open-ended and engaging questions formatted as a single string. Each question should be separated by '||'. These questions are for an anonymous social messaging platform, like Qooh.me, and should be suitable for a diverse audience. Avoid personal or sensitive topics, focusing instead on universal themes that encourage friendly interaction. For example, your output should be structured like this: 'What’s a hobby you’ve recently started?||If you could have dinner with any historical figure, who would it be?||What’s a simple thing that makes you happy?'. Ensure the questions are intriguing, foster curiosity, and contribute to a positive and welcoming conversational environment.";
+export const runtime = 'edge';
 
-//     const response = await openai.completions.create({
-//       model: 'gpt-3.5-turbo-instruct',
-//       max_tokens: 400,
-//       stream: true,
-//       prompt,
-//     });
-
-//     const stream = OpenAIStream(response);
-    
-    
-//     return new StreamingTextResponse(stream);
-//   } catch (error) {
-//     if (error instanceof OpenAI.APIError) {
-//       // OpenAI API error handling
-//       const { name, status, headers, message } = error;
-//       return NextResponse.json({ name, status, headers, message }, { status });
-//     } else {
-//       // General error handling
-//       console.error('An unexpected error occurred:', error);
-//       throw error;
-//     }
-//   }
-// }
-
-
-import { openai } from '@ai-sdk/openai';
-import { streamText, StreamData } from 'ai';
-
-// Allow streaming responses up to 30 seconds
-export const maxDuration = 30;
-
-export async function POST(req: Request) {
+export async function GET() {
   try {
-    const prompt =
-        "Create a list of three open-ended and engaging questions formatted as a single string. Each question should be separated by '||'. These questions are for an anonymous social messaging platform, like Qooh.me, and should be suitable for a diverse audience. Avoid personal or sensitive topics, focusing instead on universal themes that encourage friendly interaction. For example, your output should be structured like this: 'What’s a hobby you’ve recently started?||If you could have dinner with any historical figure, who would it be?||What’s a simple thing that makes you happy?'. Ensure the questions are intriguing, foster curiosity, and contribute to a positive and welcoming conversational environment.";
-    
-  
-    const data = new StreamData();
-    data.append({ test: 'value' });
-  
-    const result = await streamText({
-      model: openai('gpt-4-turbo'),
-      prompt,
-      onFinish() {
-        data.close();
-      },
-    });
-  
-    return result.toDataStreamResponse({ data });
+    // Shuffle and select 5 random questions
+    const shuffledQuestions = questions.sort(() => 0.5 - Math.random());
+    const selectedQuestions = shuffledQuestions.slice(0, 5).join('||');
+
+    return NextResponse.json(selectedQuestions);
   } catch (error) {
-      console.error("Error in generating messages from AI ",error)
-      throw error
+    console.error('An unexpected error occurred:', error);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
-

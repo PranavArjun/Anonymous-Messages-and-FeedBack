@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
@@ -56,10 +55,10 @@ export default function Home() {
   return (
     <div className=' bg-gradient-to-b from-black to-gray-800 w-full text-white min-h-screen md:pt-14'>
 
-      <div className="max-w-screen-lg p-4 mx-auto flex flex-col justify-center pt-14 sm:pt-0 w-full h-full ">
+      <div className="max-w-screen-lg p-4 mx-auto flex flex-col justify-center pt-8  w-full h-full ">
 
         <div className=" pb-10 flex flex-col justify-center items-center">
-          <p className="text-4xl font-bold inline "> Welcome to Anonymus Messages </p>
+          <p className="text-4xl font-bold inline text-center "> Welcome to Anonymus Messages </p>
           <p className="text-justify mt-6 text-xl text-gray-400"> Send anonymus messages or feedback directly through a simple Profile link</p>
         </div>
 
